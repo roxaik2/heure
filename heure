@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  body {
+    margin: 0;
+    background: transparent;
+    color: white;
+    font-family: Arial, sans-serif;
+    font-size: 40px;
+    text-shadow: 2px 2px 4px black;
+  }
+  #overlay {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+  }
+</style>
+</head>
+<body>
+
+<div id="overlay">
+  <div id="time"></div>
+  <div id="location"></div>
+</div>
+
+<script>
+function updateTime() {
+  const now = new Date();
+  document.getElementById("time").innerText =
+    now.toLocaleTimeString();
+}
+
+function updateLocation() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(async position => {
+      const lat = position.coords.latitude;
+      const lon = position.coords.longitude;
+
+      const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
+      const data = await res.json();
+
+      const city =
+        data.address.city ||
+        data.address.town ||
+        data.address.village ||
+        "Unknown";
+
+      document.getElementById("location").innerText = city;
+    });
+  }
+}
+
+setInterval(updateTime, 1000);
+updateLocation();
+updateTime();
+</script>
+
+</body>
+</html>
